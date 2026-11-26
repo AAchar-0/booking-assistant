@@ -2,7 +2,7 @@
 
 > An appointment booking system for a small service business: customers see real free times and book online, the database makes double booking impossible, and an AI assistant can find a time for you but can only **propose**: a human presses Confirm.
 
-**LIVE-APP:** [booking-assistant](PASTE-LIVE-URL-HERE) (first load can take up to a minute: free hosting sleeps when idle)
+**LIVE-APP:** [booking-assistant](https://aachar-0.github.io/booking-assistant/) (first load can take up to a minute: free hosting sleeps when idle)
 **Source code:** [github.com/AAchar-0/booking-assistant](https://github.com/AAchar-0/booking-assistant)
 **Author:** [Anade Acharo](https://aachar-0.github.io/)
 
