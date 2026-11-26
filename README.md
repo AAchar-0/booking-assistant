@@ -2,7 +2,7 @@
 
 > An appointment booking system for a small service business: customers see real free times and book online, the database makes double booking impossible, and an AI assistant can find a time for you but can only **propose**: a human presses Confirm.
 
-**LIVE-APP:** [booking-assistant](https://aachar-0.github.io/booking-assistant/) (first load can take up to a minute: free hosting sleeps when idle)
+**LIVE-APP:** [booking-assistant](PASTE-LIVE-URL-HERE) (first load can take up to a minute: free hosting sleeps when idle)
 **Source code:** [github.com/AAchar-0/booking-assistant](https://github.com/AAchar-0/booking-assistant)
 **Author:** [Anade Acharo](https://aachar-0.github.io/)
 
@@ -127,7 +127,7 @@ cd frontend ; npm test     # formatting and routing helpers
 API on Render (Docker, free plan), database on a free PostgreSQL provider, website on GitHub Pages through GitHub Actions.
 
 1. **Database:** create a free PostgreSQL database, then run `npm run migrate` and `npm run seed` against it from `backend/` with `DATABASE_URL` set.
-2. **API on Render:** new Web Service from this repository, language Docker, root directory `backend`, health check path `/api/health`. Environment variables: `NODE_ENV=production`, `DATABASE_URL`, `JWT_SECRET` (32+ random characters) and `ALLOWED_ORIGIN=https://aachar-0.github.io`. `ANTHROPIC_API_KEY` is optional and switches the assistant on.
+2. **API on Render:** new Web Service from this repository, language Docker, root directory `backend`, health check path `/api/health`. Environment variables: `NODE_ENV=production`, `DATABASE_URL`, `JWT_SECRET` (32+ random characters) and `ALLOWED_ORIGIN=https://aachar-0.github.io`. An AI key is optional and switches the assistant on (see the settings table: Anthropic, or Groq's free plan).
 3. **Website on GitHub Pages:** in the repository settings choose Pages > Source > GitHub Actions, and add a repository variable `API_URL` with the Render address (no trailing slash). The `Deploy website` workflow then publishes the site on every change under `frontend/`.
 
 ## API summary
@@ -150,8 +150,14 @@ Environment variables for the backend (all optional in development). A template 
 | `DATABASE_URL` | none (demo mode) | PostgreSQL connection string |
 | `JWT_SECRET` | dev value | **Required in production**: 32+ random characters |
 | `ALLOWED_ORIGIN` | none | The one website allowed to call the API from a browser |
-| `ANTHROPIC_API_KEY` | none (assistant off) | Enables the assistant |
-| `AI_MODEL` | `claude-haiku-5-5` | Model used by the assistant |
+| `AI_PROVIDER` | `anthropic` | Which AI service: `anthropic`, `groq` (free plan available) or `openai-compatible` |
+| `ANTHROPIC_API_KEY` | none (assistant off) | Key for the `anthropic` provider |
+| `AI_API_KEY` | none (assistant off) | Key for `groq` or `openai-compatible` |
+| `AI_BASE_URL` | set by `groq` | Only for `openai-compatible`: the service's `https://` address |
+| `AI_MODEL` | `claude-haiku-5-5` (`anthropic`), `llama-3.3-70b-versatile` (`groq`) | Model used by the assistant; required for `openai-compatible` |
+| `AI_REASONING_EFFORT` | empty | Optional `low`, `medium` or `high`, for models that support it |
+
+The assistant's safety rules live in this project's code, not in the AI service, so they are the same whichever provider is used. Keys are set only as environment variables on the host, never in the repository. What a visitor types into the assistant is sent to the chosen AI provider, so the demo tells visitors not to type personal details.
 | `AI_DAILY_LIMIT`, `AI_USER_HOURLY_LIMIT` | 200, 20 | Cost caps |
 | `BUSINESS_NAME`, `BUSINESS_TZ` | Acacia Studio (demo), Africa/Nairobi | Business identity and time zone |
 | `SLOT_STEP_MINUTES`, `MIN_NOTICE_MINUTES`, `MAX_DAYS_AHEAD`, `CANCEL_MIN_HOURS`, `MAX_ACTIVE_BOOKINGS` | 15, 60, 60, 2, 5 | Booking rules |

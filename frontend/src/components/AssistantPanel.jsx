@@ -6,7 +6,7 @@ import { useConfig } from '../context.js';
 import { formatDateTime, formatDate } from '../format.js';
 import { errorText } from '../ui.jsx';
 
-const GREETING = 'Hi! I can find a time, book it, or cancel a booking. For example: "a 60-minute session on Friday afternoon".';
+const GREETING = 'Hi! I can find a time, book it, or cancel a booking. For example: "a 60-minute session on Friday afternoon". Your messages are sent to an AI service, so please do not type personal details.';
 
 function ProposalCard({ proposal, state, onConfirm, onDismiss, timezone }) {
   const isBook = proposal.type === 'BOOK';

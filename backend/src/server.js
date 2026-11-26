@@ -4,6 +4,7 @@ import { createApp } from './app.js';
 import { createBookingService } from './domain/bookingService.js';
 import { createAssistant } from './ai/assistant.js';
 import { createAnthropicClient } from './ai/anthropicClient.js';
+import { createOpenAICompatClient } from './ai/openaiCompatClient.js';
 import { createPgRepo } from './repo/pgRepo.js';
 import { createMemoryRepo } from './repo/memoryRepo.js';
 import { seedDemoData } from './seedData.js';
@@ -21,9 +22,15 @@ if (config.databaseUrl) {
 }
 
 const svc = createBookingService({ repo, config });
-const client = config.ai.apiKey ? createAnthropicClient({ apiKey: config.ai.apiKey, model: config.ai.model }) : null;
+// One assistant, several possible AI services. No key means the assistant is simply switched off.
+let client = null;
+if (config.ai.apiKey) {
+  client = config.ai.provider === 'anthropic'
+    ? createAnthropicClient({ apiKey: config.ai.apiKey, model: config.ai.model })
+    : createOpenAICompatClient({ apiKey: config.ai.apiKey, model: config.ai.model, baseUrl: config.ai.baseUrl, reasoningEffort: config.ai.reasoningEffort });
+}
 const assistant = createAssistant({ client, svc, config, log: (m) => console.error(m) });
-if (!client) console.log('ANTHROPIC_API_KEY is not set: the AI assistant is switched off.');
+console.log(client ? `AI assistant is on (provider: ${config.ai.provider}, model: ${config.ai.model}).` : 'No AI key is set: the AI assistant is switched off.');
 
 const app = createApp({ repo, svc, assistant, config });
 const server = app.listen(config.port, () => console.log(`Booking API listening on port ${config.port}`));

@@ -1,6 +1,6 @@
 // Reads settings from environment variables ONCE and checks them, so a wrong setting stops the app at start-up
 // with a clear message instead of causing a strange error later.
-// Secrets (JWT_SECRET, DATABASE_URL, ANTHROPIC_API_KEY) come only from the environment and are never written in code.
+// Secrets (JWT_SECRET, DATABASE_URL, ANTHROPIC_API_KEY, AI_API_KEY) come only from the environment and are never written in code.
 
 function toInt(text, fallback, name) {
   if (text === undefined || text === '') return fallback;
@@ -9,8 +9,21 @@ function toInt(text, fallback, name) {
   return n;
 }
 
+// Which AI service powers the assistant. "anthropic" is the default. "groq" is a preset for Groq's free plan.
+// "openai-compatible" works with any service that speaks the OpenAI chat format: you then set AI_BASE_URL yourself.
+const AI_PROVIDERS = {
+  anthropic: { keyVariable: 'ANTHROPIC_API_KEY', defaultModel: 'claude-haiku-5-5', baseUrl: '' },
+  groq: { keyVariable: 'AI_API_KEY', defaultModel: 'llama-3.3-70b-versatile', baseUrl: 'https://api.groq.com/openai/v1' },
+  'openai-compatible': { keyVariable: 'AI_API_KEY', defaultModel: '', baseUrl: '' },
+};
+
 export function loadConfig(env = process.env) {
   const production = env.NODE_ENV === 'production';
+  const providerName = env.AI_PROVIDER || 'anthropic';
+  const provider = AI_PROVIDERS[providerName];
+  if (!provider) {
+    throw new Error(`AI_PROVIDER must be one of: ${Object.keys(AI_PROVIDERS).join(', ')}. Got "${providerName}".`);
+  }
 
   const config = {
     production,
@@ -36,8 +49,11 @@ export function loadConfig(env = process.env) {
       maxActiveBookingsPerCustomer: toInt(env.MAX_ACTIVE_BOOKINGS, 5, 'MAX_ACTIVE_BOOKINGS'),
     },
     ai: {
-      apiKey: env.ANTHROPIC_API_KEY || '',
-      model: env.AI_MODEL || 'claude-haiku-5-5',
+      provider: providerName,
+      apiKey: env[provider.keyVariable] || '',
+      model: env.AI_MODEL || provider.defaultModel,
+      baseUrl: (env.AI_BASE_URL || provider.baseUrl).replace(/\/+$/, ''),
+      reasoningEffort: env.AI_REASONING_EFFORT || '',
       dailyLimit: toInt(env.AI_DAILY_LIMIT, 200, 'AI_DAILY_LIMIT'),          // total assistant calls per day (cost cap)
       userHourlyLimit: toInt(env.AI_USER_HOURLY_LIMIT, 20, 'AI_USER_HOURLY_LIMIT'),
     },
@@ -48,6 +64,13 @@ export function loadConfig(env = process.env) {
   }
   if (production && !config.databaseUrl) {
     throw new Error('DATABASE_URL must be set in production.');
+  }
+  if (config.ai.apiKey && providerName !== 'anthropic') {
+    if (!config.ai.model) throw new Error('AI_MODEL must be set when AI_PROVIDER is openai-compatible (copy the exact model name from your provider).');
+    if (!/^https:\/\/[^\s/]+/.test(config.ai.baseUrl)) throw new Error('AI_BASE_URL must start with https:// (for example https://api.groq.com/openai/v1).');
+  }
+  if (config.ai.reasoningEffort && !['low', 'medium', 'high'].includes(config.ai.reasoningEffort)) {
+    throw new Error('AI_REASONING_EFFORT must be low, medium or high (or left empty).');
   }
   if (config.booking.slotStepMinutes < 5 || 60 % config.booking.slotStepMinutes !== 0) {
     throw new Error('SLOT_STEP_MINUTES must be 5, 10, 15, 20, 30 or 60.');
