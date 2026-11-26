@@ -1,0 +1,21 @@
+{
+  "name": "booking-assistant-api",
+  "version": "1.0.0",
+  "description": "REST API for an appointment booking system with an AI assistant that proposes bookings.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "author": "Anade Acharo",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}

@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Booking Assistant"
+abstract: "An appointment booking system (Node.js, Express, PostgreSQL, React) with database-enforced double-booking prevention and an AI assistant that can only propose actions, never perform them."
+type: software
+authors:
+  - given-names: "Anade"
+    family-names: "Acharo"
+version: "1.0.0"
+date-released: "2026-11-26"
+license: MIT
+repository-code: "https://github.com/AAchar-0/booking-assistant"
+keywords:
+  - nodejs
+  - express
+  - postgresql
+  - react
+  - ai-assistant
+  - booking

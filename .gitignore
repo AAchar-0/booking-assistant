@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# SECRETS: never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs (access logs contain request details; keep them out of Git)
+*.log
+logs/
+
+# IDE and OS files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Personal setup walkthrough: kept on my PC only, not published
+docs/05-setup-and-deploy-guide.md
